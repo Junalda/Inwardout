@@ -1,0 +1,32 @@
+{
+  "name": "inwardout-website",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Website for InWardOut, the practice of Jan Leyssens. Astro + TypeScript + Tailwind CSS, hosted on Vercel.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "check:links": "node scripts/check-links.mjs",
+    "verify": "astro check && astro build && node scripts/check-links.mjs"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/vercel": "^11.0.20",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource-variable/newsreader": "^5.3.0",
+    "@vercel/analytics": "^2.0.1",
+    "astro": "^7.4.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@tailwindcss/vite": "^4.3.5",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^5.9.3"
+  }
+}

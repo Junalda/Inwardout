@@ -1,0 +1,19 @@
+---
+/** The primary conversion: "Request an introductory conversation". */
+import CtaLink from './CtaLink.astro';
+import { primaryCta } from '../data/settings';
+import { getContent } from '../content';
+
+interface Props {
+  cta: string;
+  tone?: 'light' | 'dark';
+  label?: string;
+  class?: string | undefined;
+}
+const { cta, tone = 'light', label, class: className } = Astro.props;
+const { site } = getContent();
+---
+
+<CtaLink href={primaryCta.href} external={primaryCta.isExternal} cta={cta} tone={tone} class={className}>
+  {label ?? site.cta.primary}
+</CtaLink>

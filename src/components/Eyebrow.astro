@@ -1,0 +1,12 @@
+---
+interface Props {
+  tone?: 'light' | 'dark';
+  class?: string | undefined;
+}
+const { tone = 'light', class: className = '' } = Astro.props;
+---
+
+<p class:list={['eyebrow flex items-center gap-3', tone === 'light' ? 'text-copper-ink' : 'text-sand', className]}>
+  <span aria-hidden="true" class:list={['h-px w-8', tone === 'light' ? 'bg-copper' : 'bg-sand/70']}></span>
+  <slot />
+</p>

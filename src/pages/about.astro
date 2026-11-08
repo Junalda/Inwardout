@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import PrimaryCta from '../components/PrimaryCta.astro';
+import CtaLink from '../components/CtaLink.astro';
+import PortraitPlaceholder from '../components/PortraitPlaceholder.astro';
+import OrganicShape from '../components/OrganicShape.astro';
+import ClosingInvitation from '../components/ClosingInvitation.astro';
+import { getContent } from '../content';
+import { routes } from '../data/settings';
+import { personJsonLd } from '../lib/structured-data';
+
+const { about, site } = getContent();
+---
+
+<BaseLayout title={about.meta.title} description={about.meta.description} ogType="profile" jsonLd={[personJsonLd(Astro.site)]}>
+  <!-- Hero with portrait placeholder -->
+  <section class="relative overflow-hidden border-b border-forest/10">
+    <div class="container-page grid items-center gap-14 pt-14 pb-20 sm:pt-20 lg:grid-cols-12 lg:pt-24 lg:pb-24">
+      <div class="lg:col-span-7">
+        <Eyebrow class="mb-6">{about.hero.eyebrow}</Eyebrow>
+        <h1 class="text-display-2xl">{about.hero.title}</h1>
+        <p class="mt-8 max-w-xl font-display text-display-sm text-moss italic">{about.hero.lead}</p>
+        <div class="mt-10">
+          <PrimaryCta cta="about-hero-primary" />
+        </div>
+      </div>
+      <PortraitPlaceholder caption={about.portrait.caption} class="lg:col-span-5" />
+    </div>
+  </section>
+
+  <!-- Story sections, alternating -->
+  <div class="py-section">
+    <div class="container-page space-y-20 sm:space-y-28">
+      {
+        about.sections.map((s, i) => (
+          <section class="grid gap-6 lg:grid-cols-12 lg:gap-10" aria-labelledby={`about-s${i}`}>
+            <div class:list={['lg:col-span-4', i % 2 === 1 && 'lg:order-2 lg:col-start-9']}>
+              <span aria-hidden="true" class="block h-px w-12 bg-copper" />
+              <h2 id={`about-s${i}`} class="mt-6 text-display-md">
+                {s.title}
+              </h2>
+            </div>
+            <div class:list={['prose-body text-lead text-moss lg:col-span-7', i % 2 === 1 ? 'lg:order-1 lg:col-start-1' : 'lg:col-start-6']}>
+              {s.paragraphs.map((p) => <p>{p}</p>)}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Sectors -->
+  <section class="container-page" aria-labelledby="sectors-title">
+    <div class="rounded-[var(--radius-frame)] border border-forest/15 bg-ivory-light p-8 sm:p-12 lg:flex lg:items-center lg:gap-16">
+      <h2 id="sectors-title" class="text-display-md lg:w-5/12 lg:shrink-0">{about.sectors.title}</h2>
+      <p class="mt-5 text-lead text-moss lg:mt-0">{about.sectors.text}</p>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="on-dark relative isolate mt-section overflow-hidden bg-forest py-section text-sage" aria-labelledby="about-values-title">
+    <OrganicShape variant="leaf" class="absolute top-10 -right-10 -z-10 w-56 text-sand/20 sm:w-72" />
+    <div class="container-page">
+      <SectionHeading id="about-values-title" eyebrow={about.values.eyebrow} title={about.values.title} tone="dark" />
+      <dl class="mt-14 grid gap-px overflow-hidden rounded-[var(--radius-frame)] bg-sand/20 md:grid-cols-3">
+        {
+          about.values.items.map((v) => (
+            <div class="bg-forest p-8 sm:p-10">
+              <dt class="font-display text-display-md tracking-[0.12em] text-sand-light uppercase">{v.name}</dt>
+              <dd class="mt-4">{v.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- Location -->
+  <section class="py-section" aria-labelledby="location-title">
+    <div class="container-page grid items-center gap-12 md:grid-cols-12">
+      <div class="md:col-span-6">
+        <h2 id="location-title" class="text-display-lg">{about.location.title}</h2>
+        <div class="prose-body mt-6 text-lead text-moss">
+          {about.location.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+        <div class="mt-8">
+          <CtaLink href={routes.programmes} variant="text" cta="about-location-programmes">{site.cta.programmes}</CtaLink>
+        </div>
+      </div>
+      <div class="relative md:col-span-5 md:col-start-8" aria-hidden="true">
+        <OrganicShape variant="ripple" class="mx-auto w-full max-w-sm text-copper/70" />
+        <p class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center font-display text-display-sm text-forest">
+          {
+            about.location.places.map((place, i) => (
+              <>
+                {i > 0 && <span class="h-6 w-px bg-copper" />}
+                <span class:list={[i === about.location.places.length - 1 && 'text-moss italic']}>{place}</span>
+              </>
+            ))
+          }
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <ClosingInvitation title={about.closing.title} text={about.closing.text} cta="about-closing-primary" />
+</BaseLayout>

@@ -1,0 +1,33 @@
+---
+/**
+ * Optional analytics. Rendered only when PUBLIC_ANALYTICS_ENABLED=true.
+ * - Vercel Web Analytics (cookieless page views).
+ * - CTA click events: only the CTA id and the page path are sent. Never form
+ *   content, email addresses or other personal data.
+ * When disabled, no analytics script is included in the page at all.
+ */
+import VercelAnalytics from '@vercel/analytics/astro';
+import { analyticsEnabled } from '../data/settings';
+---
+
+{
+  analyticsEnabled && (
+    <>
+      <VercelAnalytics />
+      <script>
+        type Va = (event: 'event', payload: { name: string; data?: Record<string, string> }) => void;
+        document.addEventListener('click', (e) => {
+          const el = (e.target as Element | null)?.closest<HTMLElement>('[data-cta]');
+          const va = (window as unknown as { va?: Va }).va;
+          if (!el || !va) return;
+          va('event', { name: 'cta_click', data: { cta: el.dataset.cta ?? 'unknown', page: location.pathname } });
+        });
+        document.addEventListener('inwardout:form', (e) => {
+          const va = (window as unknown as { va?: Va }).va;
+          const detail = (e as CustomEvent<{ status: string }>).detail;
+          if (va && detail) va('event', { name: 'contact_form', data: { status: detail.status } });
+        });
+      </script>
+    </>
+  )
+}

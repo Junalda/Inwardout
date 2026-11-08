@@ -1,0 +1,26 @@
+---
+/** Hero for inner pages. Holds the page's single H1. */
+import Eyebrow from './Eyebrow.astro';
+import OrganicShape from './OrganicShape.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  shape?: 'pebble' | 'leaf' | 'ripple';
+}
+const { eyebrow, title, lead, shape = 'ripple' } = Astro.props;
+---
+
+<section class="relative overflow-hidden border-b border-forest/10">
+  <OrganicShape
+    variant={shape}
+    class={`pointer-events-none absolute -top-24 -right-28 w-[22rem] sm:w-[28rem] lg:-right-16 lg:w-[34rem] ${shape === 'pebble' ? 'text-linen' : 'text-copper/40'}`}
+  />
+  <div class="container-page relative pt-16 pb-16 sm:pt-24 sm:pb-20 lg:pt-28 lg:pb-24">
+    <Eyebrow class="mb-6">{eyebrow}</Eyebrow>
+    <h1 class="max-w-4xl text-display-xl">{title}</h1>
+    <p class="mt-7 max-w-2xl text-lead text-moss">{lead}</p>
+    {Astro.slots.has('default') && <div class="mt-10 flex flex-wrap gap-4"><slot /></div>}
+  </div>
+</section>

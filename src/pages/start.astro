@@ -1,0 +1,129 @@
+---
+/**
+ * /start: landing page for Jan's LinkedIn profile and outreach.
+ * Minimal navigation, one conversion route, understandable on its own.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import PrimaryCta from '../components/PrimaryCta.astro';
+import OrganicShape from '../components/OrganicShape.astro';
+import PortraitPlaceholder from '../components/PortraitPlaceholder.astro';
+import ProgrammeOverview from '../components/ProgrammeOverview.astro';
+import ValuesMark from '../components/ValuesMark.astro';
+import ClosingInvitation from '../components/ClosingInvitation.astro';
+import { getContent } from '../content';
+import { organisationJsonLd } from '../lib/structured-data';
+
+const { start, site } = getContent();
+---
+
+<BaseLayout title={start.meta.title} description={start.meta.description} chrome="minimal" jsonLd={[organisationJsonLd(Astro.site, site.defaultDescription)]}>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <OrganicShape variant="ripple" class="pointer-events-none absolute -top-40 -right-48 w-[34rem] text-copper/35 sm:w-[44rem]" />
+    <div class="container-page relative pt-14 pb-20 sm:pt-20 lg:pt-28 lg:pb-28">
+      <Eyebrow class="mb-7">{start.hero.eyebrow}</Eyebrow>
+      <h1 class="max-w-5xl text-display-xl">{start.hero.title}</h1>
+      <p class="mt-8 max-w-2xl text-lead text-moss">{start.hero.lead}</p>
+      <div class="mt-10">
+        <PrimaryCta cta="start-hero-primary" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 · Personal introduction -->
+  <section class="bg-linen py-section" aria-labelledby="start-intro-title">
+    <div class="container-page grid items-center gap-14 md:grid-cols-12">
+      <PortraitPlaceholder size="md" class="md:col-span-5" />
+      <div class="md:col-span-6 md:col-start-7">
+        <Eyebrow class="mb-5">{start.intro.eyebrow}</Eyebrow>
+        <h2 id="start-intro-title" class="text-display-lg">{start.intro.title}</h2>
+        <div class="prose-body mt-7 text-lead text-moss">
+          {start.intro.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+        <p class="mt-8 font-display text-lg text-forest italic">{start.intro.signature}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · Recognition -->
+  <section class="py-section" aria-labelledby="start-recognition-title">
+    <div class="container-page grid gap-12 lg:grid-cols-12">
+      <h2 id="start-recognition-title" class="text-display-lg lg:col-span-4">{start.recognition.title}</h2>
+      <div class="lg:col-span-7 lg:col-start-6">
+        <ul class="border-t border-forest/15">
+          {
+            start.recognition.items.map((item) => (
+              <li class="flex gap-5 border-b border-forest/15 py-6 font-display text-display-sm text-forest">
+                <span aria-hidden="true" class="mt-[0.6em] h-2 w-2 shrink-0 rounded-full bg-copper" />
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-8 text-lead text-moss">{start.recognition.closing}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 + 4 · What InWardOut is; coaching and bodywork -->
+  <section class="on-dark relative isolate overflow-hidden bg-forest py-section text-sage" aria-labelledby="start-explanation-title">
+    <OrganicShape variant="pebble" class="absolute -top-48 -left-48 -z-10 w-[34rem] text-forest-soft/70" />
+    <div class="container-page">
+      <div class="grid gap-12 lg:grid-cols-12">
+        <div class="lg:col-span-5">
+          <Eyebrow tone="dark" class="mb-5">{start.explanation.eyebrow}</Eyebrow>
+          <h2 id="start-explanation-title" class="text-display-lg text-ivory">{start.explanation.title}</h2>
+          <ValuesMark tone="dark" class="mt-10 text-sm" />
+        </div>
+        <div class="prose-body text-lead lg:col-span-6 lg:col-start-7">
+          {start.explanation.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+
+      <div class="mt-20 border-t border-sand/20 pt-14">
+        <h3 class="text-display-md text-ivory">{start.roles.title}</h3>
+        <div class="mt-10 grid gap-px overflow-hidden rounded-[var(--radius-frame)] bg-sand/20 md:grid-cols-2">
+          {
+            [start.roles.coaching, start.roles.bodywork].map((role) => (
+              <div class="bg-forest p-8 sm:p-10">
+                <h4 class="text-display-sm text-sand-light">{role.title}</h4>
+                <p class="mt-4">{role.text}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · Who it may suit -->
+  <section class="py-section" aria-labelledby="start-fit-title">
+    <div class="container-page grid gap-12 lg:grid-cols-12">
+      <h2 id="start-fit-title" class="text-display-lg lg:col-span-4">{start.fit.title}</h2>
+      <ul class="grid gap-x-10 sm:grid-cols-2 lg:col-span-7 lg:col-start-6">
+        {
+          start.fit.items.map((item) => (
+            <li class="flex gap-4 border-t border-forest/15 py-6 text-forest">
+              <span aria-hidden="true" class="mt-[0.85em] h-px w-5 shrink-0 bg-copper" />
+              <span>{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6 · Programmes -->
+  <section class="border-t border-forest/10 pt-section" aria-labelledby="start-programmes-title">
+    <div class="container-page">
+      <h2 id="start-programmes-title" class="text-display-lg">{start.programmes.title}</h2>
+      <div class="mt-12">
+        <ProgrammeOverview ctaPrefix="start" showLink={false} />
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · Invitation -->
+  <ClosingInvitation title={start.closing.title} text={start.closing.text} cta="start-closing-primary" />
+</BaseLayout>

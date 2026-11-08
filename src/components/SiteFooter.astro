@@ -1,0 +1,76 @@
+---
+import Wordmark from './Wordmark.astro';
+import { mainNav, routes } from '../data/settings';
+import { getContent } from '../content';
+
+interface Props {
+  variant?: 'full' | 'minimal';
+}
+const { variant = 'full' } = Astro.props;
+const { site } = getContent();
+const year = new Date().getFullYear();
+---
+
+<footer class="on-dark bg-forest-deep text-sage">
+  {
+    variant === 'full' ? (
+      <div class="container-page grid gap-12 py-16 md:grid-cols-12 md:py-20">
+        <div class="md:col-span-5">
+          <a href={routes.home} class="inline-block rounded text-[2rem] leading-none text-ivory" aria-label={site.a11y.homeLink} data-cta="footer-wordmark">
+            <Wordmark tone="light" />
+          </a>
+          <p class="mt-5 max-w-sm">{site.footer.intro}</p>
+          <p class="mt-8 font-display text-lg tracking-[0.2em] text-sand uppercase">
+            {site.footer.values.map((v, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true" class="mx-2 text-copper">—</span>}
+                <span>{v}</span>
+              </>
+            ))}
+          </p>
+        </div>
+
+        <nav aria-label={site.a11y.footerNav} class="md:col-span-3 md:col-start-7">
+          <h2 class="eyebrow font-sans text-sand">{site.footer.exploreHeading}</h2>
+          <ul class="mt-5 space-y-2.5">
+            {(['home', ...mainNav, 'contact'] as const).map((key) => (
+              <li>
+                <a href={routes[key]} class="link-underline text-ivory/90 hover:text-ivory" data-cta={`footer-nav-${key}`}>
+                  {site.nav[key]}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="md:col-span-3">
+          <h2 class="eyebrow font-sans text-sand">{site.footer.whereHeading}</h2>
+          <ul class="mt-5 space-y-2.5">
+            {site.footer.where.map((line) => (
+              <li>{line}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ) : (
+      <div class="container-page py-12">
+        <a href={routes.home} class="inline-block rounded text-[1.6rem] leading-none text-ivory" aria-label={site.a11y.homeLink} data-cta="start-footer-wordmark">
+          <Wordmark tone="light" />
+        </a>
+        <p class="mt-4 max-w-md">{site.footer.intro}</p>
+        <p class="mt-4">
+          <a href={routes.home} class="link-underline text-ivory" data-cta="start-footer-fullsite">
+            {site.footer.fullSite}
+          </a>
+        </p>
+      </div>
+    )
+  }
+
+  <div class="border-t border-ivory/10">
+    <div class="container-page flex flex-col gap-3 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+      <p>{site.footer.copyright(year)}</p>
+      <a href={routes.privacy} class="link-underline" data-cta={`${variant === 'minimal' ? 'start-' : ''}footer-privacy`}>{site.footer.privacy}</a>
+    </div>
+  </div>
+</footer>

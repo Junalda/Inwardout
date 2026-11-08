@@ -1,0 +1,33 @@
+---
+/**
+ * Placeholder composition for Jan's portrait. Typography and abstract forms
+ * only: no stock or generated person. Replace with a real photo of Jan
+ * (via astro:assets <Image>, with fixed width/height) once supplied.
+ */
+import OrganicShape from './OrganicShape.astro';
+
+interface Props {
+  caption?: string;
+  size?: 'md' | 'lg';
+  class?: string | undefined;
+}
+const { caption, size = 'lg', class: className = '' } = Astro.props;
+---
+
+<figure class:list={['relative', className]}>
+  <div
+    class:list={[
+      'on-dark relative isolate mx-auto flex aspect-[4/5] w-full items-end overflow-hidden rounded-t-full rounded-b-[var(--radius-frame)] bg-forest',
+      size === 'lg' ? 'max-w-md' : 'max-w-sm',
+    ]}
+    aria-hidden="true"
+  >
+    <OrganicShape variant="pebble" class="absolute -right-16 top-[18%] -z-10 w-[85%] text-forest-soft" />
+    <OrganicShape variant="leaf" class="absolute left-1/2 top-[12%] -z-10 w-[46%] -translate-x-1/2 text-sand/45" />
+    <div class="w-full p-8 sm:p-10">
+      <span class="block font-display text-[clamp(4.5rem,12vw,7rem)] leading-none text-sand-light">JL</span>
+      <span class="mt-4 block h-px w-12 bg-copper"></span>
+    </div>
+  </div>
+  {caption && <figcaption class="mt-5 text-center text-sm tracking-wide text-moss">{caption}</figcaption>}
+</figure>

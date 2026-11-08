@@ -1,0 +1,42 @@
+---
+/** Decorative organic forms. Always aria-hidden; purely visual. */
+interface Props {
+  variant?: 'pebble' | 'leaf' | 'ripple' | 'arc';
+  class?: string | undefined;
+}
+const { variant = 'pebble', class: className = '' } = Astro.props;
+---
+
+{
+  variant === 'pebble' && (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 400 360" class={className} fill="currentColor">
+      <path d="M204 18c62-6 128 20 163 74 34 52 33 126-3 177-37 52-106 80-170 73-63-7-122-48-154-103C9 186 4 117 37 71 70 26 142 24 204 18Z" />
+    </svg>
+  )
+}
+{
+  variant === 'leaf' && (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 300 420" class={className} fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M150 12C70 96 34 190 52 276c14 66 56 112 98 132 42-20 84-66 98-132 18-86-18-180-98-264Z" />
+      <path d="M150 40v360" />
+      <path d="M150 140c-28-12-50-30-64-52M150 210c-34-12-62-34-80-62M150 280c-30-10-56-28-74-52M150 140c28-12 50-30 64-52M150 210c34-12 62-34 80-62M150 280c30-10 56-28 74-52" opacity=".55" />
+    </svg>
+  )
+}
+{
+  variant === 'ripple' && (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 400 400" class={className} fill="none" stroke="currentColor" stroke-width="1">
+      <path d="M200 60c80 0 140 58 140 140s-62 140-140 140S60 280 60 200 120 60 200 60Z" />
+      <path d="M200 100c58 0 100 42 100 100s-44 100-100 100-100-44-100-100 42-100 100-100Z" opacity=".75" />
+      <path d="M200 140c34 0 60 26 60 60s-26 60-60 60-60-26-60-60 26-60 60-60Z" opacity=".5" />
+      <path d="M200 20c100 0 180 78 180 180s-80 180-180 180S20 302 20 200 100 20 200 20Z" opacity=".35" />
+    </svg>
+  )
+}
+{
+  variant === 'arc' && (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 600 140" preserveAspectRatio="none" class={className} fill="none" stroke="currentColor" stroke-width="1">
+      <path d="M0 120C120 40 240 10 300 10s180 30 300 110" />
+    </svg>
+  )
+}

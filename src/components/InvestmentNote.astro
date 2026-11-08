@@ -1,0 +1,29 @@
+---
+/** Shows the investment notice, or (only when enabled in config) the price. */
+import { formatEur, pricing, type ProgrammeFacts } from '../data/programmes';
+import { getContent } from '../content';
+
+interface Props {
+  programme?: ProgrammeFacts;
+  tone?: 'light' | 'dark';
+  class?: string | undefined;
+}
+const { programme, tone = 'light', class: className = '' } = Astro.props;
+const { site, programmesPage } = getContent();
+const showPrice = pricing.publish && programme;
+---
+
+{
+  showPrice ? (
+    <p class:list={[tone === 'light' ? 'text-moss' : 'text-sage', className]}>
+      <span class="eyebrow mr-3">{programmesPage.labels.investment}</span>
+      <span class:list={['font-display text-2xl', tone === 'light' ? 'text-forest' : 'text-ivory']}>{formatEur(programme.investmentEur)}</span>
+      {pricing.note && <span class="mt-1 block text-sm">{pricing.note}</span>}
+    </p>
+  ) : !pricing.publish ? (
+    <p class:list={['flex gap-3 text-[0.98rem]', tone === 'light' ? 'text-moss' : 'text-sage', className]}>
+      <span aria-hidden="true" class="mt-[0.7em] h-px w-5 shrink-0 bg-copper" />
+      <span>{site.investmentNotice}</span>
+    </p>
+  ) : null
+}

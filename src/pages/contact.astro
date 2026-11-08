@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import ContactForm from '../components/ContactForm.astro';
+import OrganicShape from '../components/OrganicShape.astro';
+import { getContent } from '../content';
+import { isContactFormActive } from '../lib/contact/server';
+
+const { contact } = getContent();
+// Evaluated at build time (server side). Secrets are never sent to the browser;
+// the endpoint re-checks the configuration on every request.
+const active = isContactFormActive();
+---
+
+<BaseLayout title={contact.meta.title} description={contact.meta.description}>
+  <section class="relative overflow-hidden">
+    <OrganicShape variant="ripple" class="pointer-events-none absolute -top-32 -left-40 w-[30rem] text-copper/30" />
+    <div class="container-page relative grid gap-14 pt-14 pb-section sm:pt-20 lg:grid-cols-12 lg:gap-12 lg:pt-24">
+      <div class="lg:col-span-5">
+        <div class="lg:sticky lg:top-32">
+          <Eyebrow class="mb-6">{contact.hero.eyebrow}</Eyebrow>
+          <h1 class="text-display-xl">{contact.hero.title}</h1>
+          <p class="mt-7 text-lead text-moss">{contact.hero.lead}</p>
+
+          <div class="mt-12 border-t border-forest/15 pt-8">
+            <h2 class="text-display-sm">{contact.aside.title}</h2>
+            <ul class="mt-5 space-y-3">
+              {
+                contact.aside.items.map((item) => (
+                  <li class="flex gap-4 text-moss">
+                    <span aria-hidden="true" class="mt-[0.85em] h-px w-5 shrink-0 bg-copper" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="mt-8 rounded-2xl bg-linen p-5 text-[0.98rem] text-moss">{contact.aside.note}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7">
+        <div class="rounded-[var(--radius-frame)] border border-forest/15 bg-ivory-light/70 p-6 sm:p-10">
+          <h2 class="sr-only">{contact.form.legend}</h2>
+          <ContactForm active={active} />
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,341 @@
+---
+/**
+ * Introductory conversation request form.
+ * - Works without JavaScript (native validation + POST + redirect).
+ * - With JavaScript: shared client validation, accessible inline errors and
+ *   error summary, sending status, double-submit protection and a success
+ *   message that is shown ONLY after the server confirms delivery.
+ * - When no delivery service is configured (`active` is false), the form is
+ *   visually complete but nothing is sent, and a notice says so.
+ */
+import { getContent } from '../content';
+import { routes } from '../data/settings';
+import { LIMITS, FORMAT_VALUES } from '../lib/contact/validation';
+
+interface Props {
+  active: boolean;
+}
+const { active } = Astro.props;
+const { contact } = getContent();
+const f = contact.form;
+
+const input =
+  'mt-2 block w-full rounded-xl border border-forest/30 bg-ivory-light px-4 py-3.5 text-base text-forest placeholder:text-moss/70 transition-colors hover:border-forest/50 focus:border-forest focus:outline-2 focus:outline-offset-2 focus:outline-copper-ink aria-[invalid=true]:border-error';
+const label = 'block font-medium text-forest';
+const hint = 'mt-1.5 block text-sm text-moss';
+const errorCls = 'field-error mt-2 flex gap-2 text-sm font-medium text-error';
+---
+
+<div class="contact-form-root" data-active={active ? 'true' : 'false'}>
+  {
+    !active && (
+      <div class="mb-10 rounded-2xl border border-copper/60 bg-linen px-6 py-5" role="note" aria-labelledby="form-inactive-title">
+        <p id="form-inactive-title" class="font-medium text-forest">
+          {contact.inactive.title}
+        </p>
+        <p class="mt-1 text-[0.98rem] text-moss">{contact.inactive.text}</p>
+      </div>
+    )
+  }
+
+  <div class="success-panel rounded-[var(--radius-frame)] border border-forest/15 bg-ivory-light p-8 sm:p-10" tabindex="-1" hidden>
+    <p class="font-display text-display-sm text-forest">{contact.success.title}</p>
+    <p class="mt-3 text-moss">{contact.success.text}</p>
+  </div>
+
+  <form
+    method="post"
+    action="/api/contact"
+    class="contact-form space-y-8"
+    aria-describedby="form-required-note"
+    data-messages={JSON.stringify({ ...contact.errors, inactive: contact.inactive.notSent, submitting: f.submitting, submit: f.submit })}
+  >
+    <div class="error-summary rounded-2xl border border-error/50 bg-ivory-light p-6" tabindex="-1" hidden aria-labelledby="error-summary-title">
+      <p id="error-summary-title" class="font-medium text-error">{contact.errors.summary}</p>
+      <ul class="mt-3 list-disc space-y-1 pl-5 text-[0.98rem]"></ul>
+    </div>
+
+    <p id="form-required-note" class="text-sm text-moss">{f.requiredNote}</p>
+
+    <div class="grid gap-8 sm:grid-cols-2">
+      <div data-field="name">
+        <label for="cf-name" class={label}>
+          {f.fields.name.label} <span class="text-sm font-normal text-moss">({f.required})</span>
+        </label>
+        <input
+          id="cf-name"
+          name="name"
+          type="text"
+          class={input}
+          autocomplete="name"
+          required
+          maxlength={LIMITS.nameMax}
+          aria-describedby="cf-name-error"
+        />
+        <p id="cf-name-error" class={errorCls} hidden></p>
+      </div>
+
+      <div data-field="email">
+        <label for="cf-email" class={label}>
+          {f.fields.email.label} <span class="text-sm font-normal text-moss">({f.required})</span>
+        </label>
+        <input
+          id="cf-email"
+          name="email"
+          type="email"
+          inputmode="email"
+          class={input}
+          autocomplete="email"
+          spellcheck="false"
+          required
+          maxlength={LIMITS.emailMax}
+          aria-describedby="cf-email-hint cf-email-error"
+        />
+        <span id="cf-email-hint" class={hint}>{f.fields.email.hint}</span>
+        <p id="cf-email-error" class={errorCls} hidden></p>
+      </div>
+    </div>
+
+    <div data-field="company">
+      <label for="cf-company" class={label}>
+        {f.fields.company.label} <span class="text-sm font-normal text-moss">({f.optional})</span>
+      </label>
+      <input
+        id="cf-company"
+        name="company"
+        type="text"
+        class={input}
+        autocomplete="organization"
+        maxlength={LIMITS.companyMax}
+        aria-describedby="cf-company-error"
+      />
+      <p id="cf-company-error" class={errorCls} hidden></p>
+    </div>
+
+    <div data-field="message">
+      <label for="cf-message" class={label}>
+        {f.fields.message.label} <span class="text-sm font-normal text-moss">({f.required})</span>
+      </label>
+      <span id="cf-message-hint" class={hint}>{f.fields.message.hint}</span>
+      <textarea
+        id="cf-message"
+        name="message"
+        rows="6"
+        class:list={[input, 'min-h-40 resize-y leading-relaxed']}
+        autocomplete="off"
+        required
+        minlength={LIMITS.messageMin}
+        maxlength={LIMITS.messageMax}
+        aria-describedby="cf-message-hint cf-message-error"></textarea>
+      <p id="cf-message-error" class={errorCls} hidden></p>
+    </div>
+
+    <fieldset data-field="format" aria-describedby="cf-format-error">
+      <legend class={label}>
+        {f.fields.format.legend} <span class="text-sm font-normal text-moss">({f.required})</span>
+      </legend>
+      <div class="mt-3 grid gap-3 sm:grid-cols-3">
+        {
+          FORMAT_VALUES.map((value) => (
+            <label class="format-option relative flex cursor-pointer items-center gap-3 rounded-xl border border-forest/30 bg-ivory-light px-4 py-3.5 transition-colors hover:border-forest/60 has-[:checked]:border-forest has-[:checked]:bg-linen has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-copper-ink">
+              <input
+                type="radio"
+                name="format"
+                value={value}
+                required
+                class="peer h-5 w-5 shrink-0 appearance-none rounded-full border border-forest/50 bg-ivory-light checked:border-[6px] checked:border-forest focus:outline-none"
+              />
+              <span>{f.fields.format.options[value]}</span>
+            </label>
+          ))
+        }
+      </div>
+      <p id="cf-format-error" class={errorCls} hidden></p>
+    </fieldset>
+
+    <!-- Honeypot: hidden from people and assistive tech; bots tend to fill it. -->
+    <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+      <label for="cf-website">{f.fields.honeypot.label}</label>
+      <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="flex flex-col gap-6 border-t border-forest/15 pt-8 sm:flex-row sm:items-center sm:justify-between">
+      <p class="max-w-sm text-sm text-moss">
+        {f.privacy}
+        <a href={routes.privacy} class="link-underline text-forest">{f.privacyLink}</a>
+      </p>
+      <button
+        type="submit"
+        class="submit-button inline-flex min-w-48 items-center justify-center gap-3 rounded-full bg-forest px-8 py-4 font-medium text-ivory-light transition-colors hover:bg-forest-deep aria-disabled:cursor-wait aria-disabled:opacity-70"
+        data-cta="contact-form-submit"
+      >
+        <span class="spinner hidden h-4 w-4 animate-spin rounded-full border-2 border-ivory/40 border-t-ivory" aria-hidden="true"></span>
+        <span class="submit-label">{f.submit}</span>
+      </button>
+    </div>
+
+    <p class="form-status min-h-6 text-[0.98rem] font-medium" role="status" aria-live="polite"></p>
+  </form>
+</div>
+
+<script>
+  import { normalise, validate, validateField, FIELD_ORDER, type FieldName, type ErrorKey } from '../lib/contact/validation';
+
+  type Messages = Record<ErrorKey | 'generic' | 'network' | 'rejected' | 'inactive' | 'submitting' | 'submit', string>;
+
+  for (const root of document.querySelectorAll<HTMLElement>('.contact-form-root')) {
+    const form = root.querySelector<HTMLFormElement>('form.contact-form');
+    if (!form) continue;
+
+    const active = root.dataset.active === 'true';
+    const msg = JSON.parse(form.dataset.messages ?? '{}') as Messages;
+    const summary = form.querySelector<HTMLElement>('.error-summary')!;
+    const summaryList = summary.querySelector('ul')!;
+    const status = form.querySelector<HTMLElement>('.form-status')!;
+    const button = form.querySelector<HTMLButtonElement>('.submit-button')!;
+    const buttonLabel = button.querySelector<HTMLElement>('.submit-label')!;
+    const spinner = button.querySelector<HTMLElement>('.spinner')!;
+    const success = root.querySelector<HTMLElement>('.success-panel')!;
+    const touched = new Set<FieldName>();
+    let submitting = false;
+
+    // Take over from native browser validation.
+    form.noValidate = true;
+
+    const read = () => {
+      const data = new FormData(form);
+      return normalise({
+        name: data.get('name'),
+        email: data.get('email'),
+        company: data.get('company'),
+        message: data.get('message'),
+        format: data.get('format'),
+        website: data.get('website'),
+      });
+    };
+
+    const controlFor = (field: FieldName): HTMLElement | null =>
+      field === 'format'
+        ? form.querySelector<HTMLInputElement>('input[name="format"]')
+        : form.querySelector<HTMLElement>(`[name="${field}"]`);
+
+    const showFieldError = (field: FieldName, key: ErrorKey | undefined) => {
+      const el = document.getElementById(`cf-${field}-error`);
+      if (!el) return;
+      const controls = field === 'format' ? [...form.querySelectorAll<HTMLInputElement>('input[name="format"]')] : [controlFor(field)];
+      for (const c of controls) {
+        if (!c) continue;
+        if (key) c.setAttribute('aria-invalid', 'true');
+        else c.removeAttribute('aria-invalid');
+      }
+      el.textContent = key ? msg[key] : '';
+      el.hidden = !key;
+    };
+
+    const setSending = (on: boolean) => {
+      submitting = on;
+      button.setAttribute('aria-disabled', String(on));
+      spinner.classList.toggle('hidden', !on);
+      buttonLabel.textContent = on ? msg.submitting : msg.submit;
+    };
+
+    const setStatus = (text: string, tone: 'info' | 'error' = 'info') => {
+      status.textContent = text;
+      status.classList.toggle('text-error', tone === 'error');
+      status.classList.toggle('text-moss', tone === 'info');
+    };
+
+    const renderSummary = (errors: Partial<Record<FieldName, ErrorKey>>) => {
+      summaryList.replaceChildren();
+      for (const field of FIELD_ORDER) {
+        const key = errors[field];
+        if (!key) continue;
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = field === 'format' ? '#cf-format-error' : `#cf-${field}`;
+        a.className = 'link-underline text-forest';
+        a.textContent = msg[key];
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          controlFor(field)?.focus();
+        });
+        li.append(a);
+        summaryList.append(li);
+      }
+      summary.hidden = summaryList.childElementCount === 0;
+    };
+
+    // Inline validation after a field has been visited.
+    form.addEventListener('focusout', (e) => {
+      const target = e.target as HTMLInputElement;
+      const field = target.name as FieldName;
+      if (!FIELD_ORDER.includes(field) || field === 'format') return;
+      touched.add(field);
+      showFieldError(field, validateField(field, read()));
+    });
+    form.addEventListener('input', (e) => {
+      const field = (e.target as HTMLInputElement).name as FieldName;
+      if (touched.has(field) || field === 'format') showFieldError(field, validateField(field, read()));
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (submitting) return; // double-submit protection
+
+      setStatus('');
+      const input = read();
+      const result = validate(input);
+
+      if (!result.ok) {
+        for (const field of FIELD_ORDER) {
+          touched.add(field);
+          showFieldError(field, result.errors[field]);
+        }
+        renderSummary(result.errors);
+        if (!summary.hidden) summary.focus();
+        return;
+      }
+      renderSummary({});
+
+      if (!active) {
+        setStatus(msg.inactive, 'error');
+        return;
+      }
+
+      setSending(true);
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ ...input, submissionId: crypto.randomUUID() }),
+        });
+        const body = (await res.json().catch(() => ({}))) as {
+          ok?: boolean;
+          outcome?: string;
+          errors?: Partial<Record<FieldName, ErrorKey>>;
+        };
+
+        if (res.ok && body.ok === true && body.outcome === 'sent') {
+          document.dispatchEvent(new CustomEvent('inwardout:form', { detail: { status: 'sent' } }));
+          form.hidden = true;
+          success.hidden = false;
+          success.focus();
+          return;
+        }
+
+        document.dispatchEvent(new CustomEvent('inwardout:form', { detail: { status: body.outcome ?? 'error' } }));
+        if (body.outcome === 'inactive') setStatus(msg.inactive, 'error');
+        else if (body.outcome === 'invalid' && body.errors && Object.keys(body.errors).length) {
+          for (const field of FIELD_ORDER) showFieldError(field, body.errors[field]);
+          renderSummary(body.errors);
+          summary.focus();
+        } else if (body.outcome === 'invalid') setStatus(msg.rejected, 'error');
+        else setStatus(msg.generic, 'error');
+      } catch {
+        setStatus(msg.network, 'error');
+      } finally {
+        setSending(false);
+      }
+    });
+  }
+</script>

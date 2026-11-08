@@ -1,0 +1,29 @@
+---
+/** DRAFT privacy notice. Always noindex and excluded from the sitemap. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getContent } from '../content';
+
+const { privacy } = getContent();
+---
+
+<BaseLayout title={privacy.meta.title} description={privacy.meta.description} noindex>
+  <article class="container-page py-section">
+    <div class="max-w-3xl">
+      <p class="eyebrow inline-block rounded-full border border-copper px-3 py-1 text-copper-ink">{privacy.draftBadge}</p>
+      <h1 class="mt-6 text-display-xl">{privacy.title}</h1>
+      <p class="mt-8 rounded-2xl border border-copper/60 bg-linen p-6 text-moss" role="note">{privacy.draftNotice}</p>
+      <div class="mt-14 space-y-12">
+        {
+          privacy.sections.map((s) => (
+            <section>
+              <h2 class="text-display-sm">{s.title}</h2>
+              <div class="prose-body mt-4 text-moss">
+                {s.paragraphs.map((p) => <p>{p}</p>)}
+              </div>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </article>
+</BaseLayout>

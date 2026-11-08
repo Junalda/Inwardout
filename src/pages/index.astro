@@ -1,0 +1,159 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import PrimaryCta from '../components/PrimaryCta.astro';
+import CtaLink from '../components/CtaLink.astro';
+import OrganicShape from '../components/OrganicShape.astro';
+import ValuesMark from '../components/ValuesMark.astro';
+import PortraitPlaceholder from '../components/PortraitPlaceholder.astro';
+import ProgrammeOverview from '../components/ProgrammeOverview.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import ClosingInvitation from '../components/ClosingInvitation.astro';
+import { getContent } from '../content';
+import { routes } from '../data/settings';
+import { organisationJsonLd } from '../lib/structured-data';
+
+const { home, site } = getContent();
+---
+
+<BaseLayout
+  title={home.meta.title}
+  description={home.meta.description}
+  jsonLd={[organisationJsonLd(Astro.site, site.defaultDescription)]}
+>
+  <!-- 1 · Hero -->
+  <section class="relative overflow-hidden">
+    <div class="container-page grid items-center gap-14 pt-14 pb-20 sm:pt-20 lg:grid-cols-12 lg:gap-10 lg:pt-24 lg:pb-28">
+      <div class="lg:col-span-7">
+        <Eyebrow class="mb-7">{home.hero.eyebrow}</Eyebrow>
+        <h1 class="text-display-2xl">{home.hero.title}</h1>
+        <p class="mt-8 max-w-xl text-lead text-moss">{home.hero.lead}</p>
+        <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+          <PrimaryCta cta="home-hero-primary" />
+          <CtaLink href={routes.approach} variant="secondary" cta="home-hero-approach">{site.cta.approach}</CtaLink>
+        </div>
+        <p class="mt-10 text-sm tracking-wide text-moss">{home.hero.note}</p>
+      </div>
+
+      <div class="relative lg:col-span-5" aria-hidden="true">
+        <div class="on-dark relative isolate mx-auto aspect-[4/5] w-full max-w-[17rem] overflow-hidden sm:max-w-sm rounded-t-full rounded-b-[var(--radius-frame)] bg-forest sm:max-w-md">
+          <OrganicShape variant="pebble" class="absolute -bottom-10 -left-14 -z-10 w-[90%] text-forest-soft" />
+          <OrganicShape variant="ripple" class="absolute -top-8 left-1/2 -z-10 w-[120%] -translate-x-1/2 text-sand/25" />
+          <div class="absolute inset-x-0 bottom-0 p-8 sm:p-10">
+            <ValuesMark tone="dark" direction="column" class="text-[clamp(1.15rem,0.9rem+1vw,1.6rem)]" />
+          </div>
+        </div>
+        <OrganicShape variant="leaf" class="absolute -right-2 -bottom-8 hidden w-28 text-copper sm:block lg:-right-6" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · Recognition -->
+  <section class="border-t border-forest/10 py-section" aria-labelledby="recognition-title">
+    <div class="container-page grid gap-14 lg:grid-cols-12">
+      <div class="lg:col-span-5">
+        <div class="lg:sticky lg:top-32">
+          <SectionHeading id="recognition-title" eyebrow={home.recognition.eyebrow} title={home.recognition.title} />
+          <p class="mt-6 max-w-md text-lead text-moss">{home.recognition.intro}</p>
+        </div>
+      </div>
+      <ol class="grid gap-x-10 sm:grid-cols-2 lg:col-span-7">
+        {
+          home.recognition.items.map((item, i) => (
+            <li class="border-t border-forest/15 py-8">
+              <span aria-hidden="true" class="font-display text-lg text-copper-ink">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="mt-3 text-display-sm">{item.title}</h3>
+              <p class="mt-3 text-moss">{item.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 3 · Vision -->
+  <section class="on-dark relative isolate overflow-hidden bg-forest py-section text-sage" aria-labelledby="vision-title">
+    <OrganicShape variant="ripple" class="absolute -top-40 -right-40 -z-10 w-[36rem] text-sand/15" />
+    <div class="container-page">
+      <Eyebrow tone="dark" class="mb-5">{home.vision.eyebrow}</Eyebrow>
+      <h2 id="vision-title" class="text-display-lg text-ivory">{home.vision.title}</h2>
+      <blockquote class="mt-12 max-w-4xl border-l border-copper pl-6 sm:pl-10">
+        <p class="font-display text-display-md text-sand-light italic">{home.vision.quote}</p>
+      </blockquote>
+      <div class="mt-14 grid gap-8 md:grid-cols-3 md:gap-12">
+        {home.vision.paragraphs.map((p, i) => <p class:list={[i === 2 && 'text-ivory']}>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · Insight, body, action -->
+  <section class="py-section" aria-labelledby="connection-title">
+    <div class="container-page">
+      <SectionHeading id="connection-title" eyebrow={home.connection.eyebrow} title={home.connection.title} intro={home.connection.intro} />
+      <div class="relative mt-16">
+        <OrganicShape variant="arc" class="pointer-events-none absolute -top-6 left-0 hidden h-16 w-full text-copper/70 md:block" />
+        <ol class="relative grid gap-12 md:grid-cols-3 md:gap-10 md:pt-16">
+          {
+            home.connection.steps.map((step) => (
+              <li class="md:text-center">
+                <p class="font-display text-display-lg text-forest">{step.label}</p>
+                <h3 class="eyebrow mt-4 font-sans text-copper-ink">{step.title}</h3>
+                <p class="mt-4 max-w-sm text-moss md:mx-auto">{step.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <div class="mt-14 md:text-center">
+        <CtaLink href={routes.approach} variant="text" cta="home-connection-approach">{site.cta.approach}</CtaLink>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · Jan -->
+  <section class="bg-linen py-section" aria-labelledby="jan-title">
+    <div class="container-page grid items-center gap-14 md:grid-cols-12">
+      <PortraitPlaceholder size="md" class="md:col-span-5" />
+      <div class="md:col-span-6 md:col-start-7">
+        <SectionHeading id="jan-title" eyebrow={home.jan.eyebrow} title={home.jan.title} />
+        <div class="prose-body mt-7 text-moss">
+          {home.jan.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+        <div class="mt-9">
+          <CtaLink href={routes.about} variant="text" cta="home-jan-about">{site.cta.about}</CtaLink>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · Programmes -->
+  <section class="py-section" aria-labelledby="programmes-title">
+    <div class="container-page">
+      <SectionHeading id="programmes-title" eyebrow={home.programmes.eyebrow} title={home.programmes.title} intro={home.programmes.intro} />
+      <div class="mt-14">
+        <ProgrammeOverview ctaPrefix="home" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · Process -->
+  <section class="border-t border-forest/10 pt-section" aria-labelledby="process-title">
+    <div class="container-page">
+      <SectionHeading id="process-title" eyebrow={home.process.eyebrow} title={home.process.title} />
+      <div class="mt-14">
+        <ProcessSteps steps={home.process.steps} />
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · Closing -->
+  <ClosingInvitation
+    title={home.closing.title}
+    text={home.closing.text}
+    cta="home-closing-primary"
+    secondary={{ href: routes.programmes, label: site.cta.programmes, cta: 'home-closing-programmes' }}
+  />
+</BaseLayout>

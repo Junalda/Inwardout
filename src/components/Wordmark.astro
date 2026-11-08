@@ -1,0 +1,16 @@
+---
+/**
+ * Provisional typographic wordmark. Not a final logo (see CONTENT_REVIEW.md).
+ * The capital W and O mark the movement: inward, then out.
+ */
+interface Props {
+  class?: string | undefined;
+  tone?: 'dark' | 'light';
+}
+const { class: className = '', tone = 'dark' } = Astro.props;
+const accent = tone === 'dark' ? 'text-copper-ink' : 'text-sand';
+---
+
+<span class:list={['font-display tracking-[-0.015em] whitespace-nowrap', className]} translate="no">
+  In<span class={accent}>W</span>ard<span class={accent}>O</span>ut
+</span>

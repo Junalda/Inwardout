@@ -1,0 +1,27 @@
+---
+/** Closing invitation band with the primary CTA. */
+import PrimaryCta from './PrimaryCta.astro';
+import CtaLink from './CtaLink.astro';
+import OrganicShape from './OrganicShape.astro';
+
+interface Props {
+  title: string;
+  text: string;
+  cta: string;
+  secondary?: { href: string; label: string; cta: string };
+}
+const { title, text, cta, secondary } = Astro.props;
+---
+
+<section class="container-page py-section" aria-labelledby={`${cta}-title`}>
+  <div class="on-dark relative isolate overflow-hidden rounded-[var(--radius-frame)] bg-forest px-7 py-16 text-center sm:px-14 sm:py-20 lg:py-24">
+    <OrganicShape variant="ripple" class="pointer-events-none absolute -bottom-40 -left-32 -z-10 w-[26rem] text-sand/25 sm:w-[34rem]" />
+    <OrganicShape variant="ripple" class="pointer-events-none absolute -top-48 -right-40 -z-10 w-[26rem] text-sand/15 sm:w-[34rem]" />
+    <h2 id={`${cta}-title`} class="mx-auto max-w-2xl text-display-lg text-ivory">{title}</h2>
+    <p class="mx-auto mt-6 max-w-xl text-lead text-sage">{text}</p>
+    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <PrimaryCta cta={cta} tone="dark" />
+      {secondary && <CtaLink href={secondary.href} cta={secondary.cta} variant="secondary" tone="dark">{secondary.label}</CtaLink>}
+    </div>
+  </div>
+</section>

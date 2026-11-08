@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import PrimaryCta from '../components/PrimaryCta.astro';
+import CtaLink from '../components/CtaLink.astro';
+import OrganicShape from '../components/OrganicShape.astro';
+import ClosingInvitation from '../components/ClosingInvitation.astro';
+import { getContent } from '../content';
+import { routes } from '../data/settings';
+
+const { approach, site } = getContent();
+---
+
+<BaseLayout title={approach.meta.title} description={approach.meta.description}>
+  <PageHero eyebrow={approach.hero.eyebrow} title={approach.hero.title} lead={approach.hero.lead} shape="leaf">
+    <PrimaryCta cta="approach-hero-primary" />
+  </PageHero>
+
+  <!-- Themes -->
+  <section class="py-section" aria-labelledby="themes-title">
+    <div class="container-page">
+      <div class="grid gap-8 lg:grid-cols-12">
+        <h2 id="themes-title" class="text-display-lg lg:col-span-5">{approach.themesIntro.title}</h2>
+        <p class="text-lead text-moss lg:col-span-6 lg:col-start-7">{approach.themesIntro.text}</p>
+      </div>
+
+      <ol class="mt-16 sm:mt-20">
+        {
+          approach.themes.map((theme, i) => (
+            <li class="grid gap-6 border-t border-forest/15 py-12 sm:py-14 lg:grid-cols-12 lg:gap-10">
+              <span aria-hidden="true" class="font-display text-[clamp(3rem,2rem+3vw,5rem)] leading-none text-copper lg:col-span-2">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="text-display-md lg:col-span-4">{theme.title}</h3>
+              <div class="lg:col-span-6">
+                <div class="prose-body text-moss">
+                  {theme.paragraphs.map((p) => <p>{p}</p>)}
+                </div>
+                {'questions' in theme && (
+                  <div class="mt-8 rounded-2xl bg-linen p-6 sm:p-8">
+                    <p class="eyebrow text-copper-ink">{theme.questionsLabel}</p>
+                    <ul class="mt-4 space-y-3 font-display text-lg text-forest italic">
+                      {theme.questions.map((q) => (
+                        <li class="flex gap-3">
+                          <span aria-hidden="true" class="mt-[0.85em] h-px w-4 shrink-0 bg-copper" />
+                          <span>{q}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Bodywork -->
+  <section class="on-dark relative isolate overflow-hidden bg-forest py-section text-sage" aria-labelledby="bodywork-title">
+    <OrganicShape variant="pebble" class="absolute -bottom-32 -left-40 -z-10 w-[34rem] text-forest-soft/70" />
+    <div class="container-page grid gap-14 lg:grid-cols-12">
+      <div class="lg:col-span-5">
+        <Eyebrow tone="dark" class="mb-5">{approach.bodywork.eyebrow}</Eyebrow>
+        <h2 id="bodywork-title" class="text-display-lg text-ivory">{approach.bodywork.title}</h2>
+        <ul class="mt-10 flex flex-wrap gap-3" aria-label={approach.bodywork.elementsLabel}>
+          {
+            approach.bodywork.elements.map((el) => (
+              <li class="rounded-full border border-sand/40 px-4 py-2 text-sm text-sand-light">{el}</li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="lg:col-span-6 lg:col-start-7">
+        <div class="prose-body text-lead">
+          {approach.bodywork.paragraphs.map((p, i) => <p class:list={[i === 2 && 'text-ivory']}>{p}</p>)}
+        </div>
+        <p class="mt-10 border-t border-sand/20 pt-6 text-sm">{approach.bodywork.disclaimer}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What it is / is not -->
+  <section class="py-section" aria-labelledby="expect-title">
+    <div class="container-page">
+      <SectionHeading id="expect-title" title={approach.expectations.title} size="md" />
+      <div class="mt-12 grid gap-px overflow-hidden rounded-[var(--radius-frame)] border border-forest/15 bg-forest/15 md:grid-cols-2">
+        {
+          [approach.expectations.is, approach.expectations.isNot].map((col, ci) => (
+            <div class:list={['p-8 sm:p-10', ci === 0 ? 'bg-ivory-light' : 'bg-ivory']}>
+              <h3 class="text-display-sm">{col.heading}</h3>
+              <ul class="mt-6 space-y-4">
+                {col.items.map((item) => (
+                  <li class="flex gap-4 text-moss">
+                    <span
+                      aria-hidden="true"
+                      class:list={['mt-[0.55em] h-2 w-2 shrink-0 rounded-full', ci === 0 ? 'bg-copper' : 'border border-moss/60']}
+                    />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="bg-linen py-section" aria-labelledby="values-title">
+    <div class="container-page">
+      <SectionHeading id="values-title" eyebrow={approach.values.eyebrow} title={approach.values.title} />
+      <dl class="mt-14 grid gap-12 md:grid-cols-3">
+        {
+          approach.values.items.map((v) => (
+            <div>
+              <dt class="font-display text-display-md tracking-[0.12em] text-forest uppercase">{v.name}</dt>
+              <dd class="mt-4 border-t border-copper/60 pt-4 text-moss">{v.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="mt-14">
+        <CtaLink href={routes.programmes} variant="text" cta="approach-values-programmes">{site.cta.programmes}</CtaLink>
+      </div>
+    </div>
+  </section>
+
+  <ClosingInvitation
+    title={approach.closing.title}
+    text={approach.closing.text}
+    cta="approach-closing-primary"
+    secondary={{ href: routes.faq, label: site.cta.faq, cta: 'approach-closing-faq' }}
+  />
+</BaseLayout>

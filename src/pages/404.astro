@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import PrimaryCta from '../components/PrimaryCta.astro';
+import OrganicShape from '../components/OrganicShape.astro';
+import { getContent } from '../content';
+import { mainNav, routes } from '../data/settings';
+
+const { notFound, site } = getContent();
+---
+
+<BaseLayout title={notFound.meta.title} description={notFound.meta.description} noindex>
+  <section class="relative overflow-hidden">
+    <OrganicShape variant="ripple" class="pointer-events-none absolute -right-40 -bottom-40 w-[34rem] text-copper/30" />
+    <div class="container-page relative py-section">
+      <Eyebrow class="mb-6">{notFound.eyebrow}</Eyebrow>
+      <h1 class="max-w-3xl text-display-xl">{notFound.title}</h1>
+      <p class="mt-7 max-w-xl text-lead text-moss">{notFound.text}</p>
+      <nav aria-label={notFound.links} class="mt-10">
+        <ul class="flex flex-wrap gap-x-8 gap-y-3 font-display text-display-sm">
+          {
+            (['home', ...mainNav] as const).map((key) => (
+              <li>
+                <a href={routes[key]} class="link-underline" data-cta={`404-${key}`}>
+                  {site.nav[key]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="mt-12"><PrimaryCta cta="404-primary" /></div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Accordion from '../components/Accordion.astro';
+import ClosingInvitation from '../components/ClosingInvitation.astro';
+import { getContent } from '../content';
+import { routes } from '../data/settings';
+import { faqJsonLd } from '../lib/structured-data';
+
+const { faq, site } = getContent();
+const allItems = faq.groups.flatMap((g) => g.items);
+---
+
+<BaseLayout title={faq.meta.title} description={faq.meta.description} jsonLd={[faqJsonLd(allItems)]}>
+  <PageHero eyebrow={faq.hero.eyebrow} title={faq.hero.title} lead={faq.hero.lead} shape="ripple" />
+
+  <div class="container-page py-section">
+    <div class="space-y-20">
+      {
+        faq.groups.map((group, i) => (
+          <section class="grid gap-8 lg:grid-cols-12 lg:gap-10" aria-labelledby={`faq-group-${i}`}>
+            <h2 id={`faq-group-${i}`} class="text-display-md lg:col-span-4">
+              {group.title}
+            </h2>
+            <div class="lg:col-span-8">
+              <Accordion items={group.items} />
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+
+  <ClosingInvitation
+    title={faq.closing.title}
+    text={faq.closing.text}
+    cta="faq-closing-primary"
+    secondary={{ href: routes.approach, label: site.cta.approach, cta: 'faq-closing-approach' }}
+  />
+</BaseLayout>

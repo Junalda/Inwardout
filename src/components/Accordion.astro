@@ -1,0 +1,97 @@
+---
+/**
+ * Accessible accordion (WAI-ARIA APG pattern): heading > button with
+ * aria-expanded / aria-controls, region panels. Keyboard: Enter/Space toggle,
+ * ↑/↓ move between questions, Home/End jump to first/last.
+ * Without JavaScript all answers are visible.
+ */
+import type { FaqItem } from '../content/en/faq';
+
+interface Props {
+  items: readonly FaqItem[];
+  headingLevel?: 'h2' | 'h3';
+}
+const { items, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+---
+
+<div class="accordion border-t border-forest/15" data-accordion>
+  {
+    items.map((item) => (
+      <div class="border-b border-forest/15" id={item.id} data-item={item.id}>
+        <Heading class="font-sans text-base">
+          <button
+            type="button"
+            class="accordion-trigger group flex w-full items-start justify-between gap-6 py-6 text-left font-display text-display-sm text-forest transition-colors hover:text-copper-ink sm:py-7"
+            aria-expanded="true"
+            aria-controls={`${item.id}-panel`}
+            id={`${item.id}-trigger`}
+          >
+            <span>{item.question}</span>
+            <span
+              aria-hidden="true"
+              class="relative mt-1.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-forest/25 transition-colors group-hover:border-copper"
+            >
+              <span class="absolute h-px w-3 bg-current" />
+              <span class="icon-vertical absolute h-3 w-px bg-current transition-transform duration-300" />
+            </span>
+          </button>
+        </Heading>
+        <div id={`${item.id}-panel`} role="region" aria-labelledby={`${item.id}-trigger`} class="accordion-panel">
+          <div class="prose-body pr-4 pb-8 text-moss sm:pr-16">
+            {item.answer.map((para) => (
+              <p>{para}</p>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .accordion-trigger[aria-expanded='true'] .icon-vertical {
+    transform: rotate(90deg);
+  }
+  /* Avoid a flash of open answers before the script has run. */
+  :global(html.js) [data-accordion]:not([data-ready]) .accordion-panel {
+    display: none;
+  }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-accordion]')) {
+    const triggers = [...root.querySelectorAll<HTMLButtonElement>('.accordion-trigger')];
+    const hash = decodeURIComponent(location.hash.slice(1));
+
+    const set = (btn: HTMLButtonElement, open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      const panel = document.getElementById(btn.getAttribute('aria-controls') ?? '');
+      if (panel) panel.hidden = !open;
+    };
+
+    // Enhance: start collapsed, except a question linked via #anchor.
+    for (const btn of triggers) set(btn, btn.closest<HTMLElement>('[data-item]')?.dataset.item === hash);
+    root.dataset.ready = '';
+
+    window.addEventListener('hashchange', () => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      const btn = triggers.find((t) => t.closest<HTMLElement>('[data-item]')?.dataset.item === id);
+      if (btn) set(btn, true);
+    });
+
+    root.addEventListener('click', (e) => {
+      const btn = (e.target as Element).closest<HTMLButtonElement>('.accordion-trigger');
+      if (btn) set(btn, btn.getAttribute('aria-expanded') !== 'true');
+    });
+
+    root.addEventListener('keydown', (e) => {
+      const i = triggers.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0) return;
+      const next = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: triggers.length - 1 }[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      triggers[(next + triggers.length) % triggers.length]?.focus();
+    });
+  }
+</script>

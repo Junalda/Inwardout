@@ -1,0 +1,28 @@
+---
+/** Result page for form posts without JavaScript when nothing was sent. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaLink from '../../components/CtaLink.astro';
+import { getContent } from '../../content';
+import { routes } from '../../data/settings';
+
+const { contact } = getContent();
+const p = contact.notSentPage;
+const reasons = Object.entries(p.reasons);
+---
+
+<BaseLayout title={p.meta.title} description={p.meta.description} noindex>
+  <section class="container-page py-section">
+    <div class="max-w-2xl">
+      <h1 class="text-display-lg">{p.title}</h1>
+      <!-- The reason comes from ?reason=…; shown by a tiny script, generic text otherwise. -->
+      {reasons.map(([key, text]) => <p class="reason mt-6 text-lead text-moss" data-reason={key} hidden>{text}</p>)}
+      <p class="mt-6 text-lead text-moss">{p.text}</p>
+      <div class="mt-10"><CtaLink href={routes.contact} variant="secondary" cta="contact-notsent-back">{p.back}</CtaLink></div>
+    </div>
+  </section>
+  <script>
+    const reason = new URLSearchParams(location.search).get('reason');
+    const el = document.querySelector<HTMLElement>(`.reason[data-reason="${reason === 'inactive' || reason === 'invalid' ? reason : 'error'}"]`);
+    if (el) el.hidden = false;
+  </script>
+</BaseLayout>

@@ -1,0 +1,20 @@
+---
+/** Result page for form posts without JavaScript (success only after real delivery). */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaLink from '../../components/CtaLink.astro';
+import { getContent } from '../../content';
+import { routes } from '../../data/settings';
+
+const { contact } = getContent();
+const p = contact.sentPage;
+---
+
+<BaseLayout title={p.meta.title} description={p.meta.description} noindex>
+  <section class="container-page py-section">
+    <div class="max-w-2xl">
+      <h1 class="text-display-lg">{p.title}</h1>
+      <p class="mt-6 text-lead text-moss">{p.text}</p>
+      <div class="mt-10"><CtaLink href={routes.home} variant="secondary" cta="contact-sent-home">{p.back}</CtaLink></div>
+    </div>
+  </section>
+</BaseLayout>

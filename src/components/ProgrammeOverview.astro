@@ -1,0 +1,50 @@
+---
+/** Compact two-programme overview, used on / and /start. */
+import CtaLink from './CtaLink.astro';
+import InvestmentNote from './InvestmentNote.astro';
+import { programmes } from '../data/programmes';
+import { getContent } from '../content';
+import { routes } from '../data/settings';
+
+interface Props {
+  /** Prefix for analytics ids. */
+  ctaPrefix: string;
+  showLink?: boolean;
+  headingLevel?: 'h3' | 'h2';
+}
+const { ctaPrefix, showLink = true, headingLevel = 'h3' } = Astro.props;
+const { programmeCopy, programmesPage, site } = getContent();
+const l = programmesPage.labels;
+const Heading = headingLevel;
+---
+
+<div>
+  <ol class="grid gap-px overflow-hidden rounded-[var(--radius-frame)] border border-forest/15 bg-forest/15 md:grid-cols-2">
+    {
+      programmes.map((p, i) => {
+        const copy = programmeCopy[p.id];
+        return (
+          <li class:list={['flex flex-col p-8 sm:p-10 lg:p-12', i === 0 ? 'bg-ivory-light' : 'bg-linen']}>
+            <p class="font-display text-5xl text-copper-ink" aria-hidden="true">
+              0{i + 1}
+            </p>
+            <Heading class="mt-6 text-display-md">{copy.name}</Heading>
+            <p class="mt-3 text-lead text-moss italic font-display">{copy.tagline}</p>
+            <dl class="mt-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 border-t border-forest/15 pt-6 text-[0.98rem]">
+              <dt class="eyebrow pt-1 text-copper-ink">{l.duration}</dt>
+              <dd>{l.weeks(p.weeks)}</dd>
+              <dt class="eyebrow pt-1 text-copper-ink">{l.online}</dt>
+              <dd>{l.onlineSessions(p.onlineSessions)}</dd>
+              <dt class="eyebrow pt-1 text-copper-ink">{l.inPerson}</dt>
+              <dd>{p.bodyworkSessions > 0 ? l.bodyworkSessions(p.bodyworkSessions) : l.notIncluded}</dd>
+            </dl>
+          </li>
+        );
+      })
+    }
+  </ol>
+  <div class="mt-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+    <InvestmentNote />
+    {showLink && <CtaLink href={routes.programmes} variant="text" cta={`${ctaPrefix}-programmes`} class="shrink-0">{site.cta.programmes}</CtaLink>}
+  </div>
+</div>

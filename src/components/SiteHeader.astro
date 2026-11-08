@@ -1,0 +1,160 @@
+---
+import Wordmark from './Wordmark.astro';
+import PrimaryCta from './PrimaryCta.astro';
+import { mainNav, routes } from '../data/settings';
+import { getContent } from '../content';
+
+interface Props {
+  variant?: 'full' | 'minimal';
+}
+const { variant = 'full' } = Astro.props;
+const { site } = getContent();
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => path === href;
+---
+
+<header class="sticky top-0 z-40 border-b border-forest/10 bg-ivory/92 backdrop-blur-md supports-[backdrop-filter]:bg-ivory/80">
+  <div class="container-page flex h-[4.5rem] items-center justify-between gap-6 lg:h-20">
+    <a
+      href={routes.home}
+      class="-mx-1 rounded px-1 text-[1.65rem] leading-none text-forest"
+      aria-label={site.a11y.homeLink}
+      data-cta={`${variant === 'minimal' ? 'start' : 'header'}-wordmark`}
+      {...(isCurrent('/') ? { 'aria-current': 'page' } : {})}
+    >
+      <Wordmark />
+    </a>
+
+    {
+      variant === 'full' ? (
+        <>
+          <nav aria-label={site.a11y.mainNav} class="hidden lg:block">
+            <ul class="flex items-center gap-9 text-[0.98rem]">
+              {mainNav.map((key) => (
+                <li>
+                  <a
+                    href={routes[key]}
+                    data-cta={`header-nav-${key}`}
+                    class:list={[
+                      'relative py-2 transition-colors hover:text-copper-ink',
+                      'after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:bg-copper after:transition-transform after:duration-300',
+                      isCurrent(routes[key]) ? 'text-forest after:scale-x-100' : 'text-moss after:scale-x-0 hover:after:scale-x-100',
+                    ]}
+                    {...(isCurrent(routes[key]) ? { 'aria-current': 'page' } : {})}
+                  >
+                    {site.nav[key]}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div class="hidden lg:block">
+            <PrimaryCta cta="header-primary" label={site.cta.primaryShort} class="!px-5 !py-2.5 !text-[0.92rem]" />
+          </div>
+
+          <button
+            type="button"
+            class="mobile-toggle -mr-2 inline-flex h-11 items-center gap-2.5 rounded-full px-3 text-[0.95rem] font-medium text-forest lg:hidden"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+            data-label-open={site.a11y.openMenu}
+            data-label-close={site.a11y.closeMenu}
+            hidden
+          >
+            <span>{site.a11y.menu}</span>
+            <span class="sr-only toggle-label">{site.a11y.openMenu}</span>
+            <span aria-hidden="true" class="relative block h-3 w-6">
+              <span class="bar absolute inset-x-0 top-0 h-px bg-current transition-transform duration-300" />
+              <span class="bar absolute inset-x-0 bottom-0 h-px bg-current transition-transform duration-300" />
+            </span>
+          </button>
+        </>
+      ) : (
+        <PrimaryCta cta="start-header-primary" label={site.cta.primaryShort} class="!px-5 !py-2.5 !text-[0.92rem]" />
+      )
+    }
+  </div>
+
+  {
+    variant === 'full' && (
+      <nav
+        id="mobile-nav"
+        aria-label={site.a11y.mainNav}
+        class="mobile-nav border-t border-forest/10 bg-ivory lg:hidden"
+        data-state="closed"
+      >
+        <div class="container-page py-6 pb-8">
+          <ul class="divide-y divide-forest/10 border-y border-forest/10">
+            {[...mainNav, 'contact' as const].map((key) => (
+              <li>
+                <a
+                  href={routes[key]}
+                  data-cta={`mobile-nav-${key}`}
+                  class="flex items-center justify-between py-4 font-display text-[1.6rem] leading-tight text-forest"
+                  {...(isCurrent(routes[key]) ? { 'aria-current': 'page' } : {})}
+                >
+                  {site.nav[key]}
+                  {isCurrent(routes[key]) && <span aria-hidden="true" class="h-2 w-2 rounded-full bg-copper" />}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <PrimaryCta cta="mobile-nav-primary" class="mt-7 w-full" />
+        </div>
+      </nav>
+    )
+  }
+</header>
+
+<noscript>
+  <style>
+    .mobile-nav { display: block !important; }
+  </style>
+</noscript>
+
+<style>
+  /* Hidden until JavaScript enhances it; without JS the list is shown (see <noscript>). */
+  .mobile-nav[data-state='closed'] {
+    display: none;
+  }
+  .mobile-nav {
+    max-height: calc(100dvh - 4.5rem);
+    overflow-y: auto;
+  }
+  .mobile-toggle[aria-expanded='true'] .bar:first-child {
+    transform: translateY(5.5px) rotate(45deg);
+  }
+  .mobile-toggle[aria-expanded='true'] .bar:last-child {
+    transform: translateY(-5.5px) rotate(-45deg);
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.mobile-toggle');
+  const panel = document.getElementById('mobile-nav');
+
+  if (toggle && panel) {
+    toggle.hidden = false;
+    const label = toggle.querySelector('.toggle-label');
+    const desktop = window.matchMedia('(min-width: 64rem)');
+
+    const setOpen = (open: boolean, returnFocus = false) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      panel.dataset.state = open ? 'open' : 'closed';
+      if (label) label.textContent = (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? '';
+      if (!open && returnFocus) toggle.focus();
+    };
+
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') setOpen(false, true);
+    });
+    panel.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('a')) setOpen(false);
+    });
+    desktop.addEventListener('change', (e) => {
+      if (e.matches) setOpen(false);
+    });
+  }
+</script>
